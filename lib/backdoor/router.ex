@@ -30,10 +30,13 @@ defmodule Backdoor.Router do
   defmacro backdoor(path, opts \\ []) do
     quote bind_quoted: binding() do
       scope path, alias: false, as: false do
-        import Phoenix.LiveView.Router, only: [live: 4]
+        import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
 
         opts = Backdoor.Router.__options__(opts)
-        live "/", Backdoor.BackdoorLive, :backdoor, opts
+
+        live_session :backdoor, [session: opts[:session], root_layout: opts[:layout]] do
+          live "/", Backdoor.BackdoorLive, :backdoor, [private: opts[:private], as: :backdoor]
+        end
       end
     end
   end
